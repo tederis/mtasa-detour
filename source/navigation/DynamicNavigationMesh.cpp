@@ -555,6 +555,15 @@ void DynamicNavigationMesh::RemoveAllTiles()
     NavigationMesh::RemoveAllTiles();
 }
 
+std::size_t DynamicNavigationMesh::GetEffectiveTilesCount() const
+{
+    if (tileCache_) {
+        return static_cast<std::size_t>(tileCache_->getTileCount());
+    }
+    
+    return 0u;
+}
+
 void DynamicNavigationMesh::Dump(DebugMesh& mesh, bool triangulated, const BoundingBox* bounds)
 {
     if (!navMesh_) {

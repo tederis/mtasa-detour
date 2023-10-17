@@ -84,7 +84,6 @@ public:
     BoundingBox GetTileBoundingBox(const Int32Vector2& tile) const;
 
     // Return number of tiles.
-
     Int32Vector2 GetNumTiles() const { return Int32Vector2(numTilesX_, numTilesZ_); }
 
 protected:

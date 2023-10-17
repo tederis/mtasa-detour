@@ -11,6 +11,7 @@ namespace WorldAssistant
 class LuaBinding
 {
 public:
+    static int navState(lua_State* luaVM);
     static int navLoad(lua_State* luaVM);
     static int navFindPath(lua_State* luaVM);
     static int navNearestPoint(lua_State* luaVM);

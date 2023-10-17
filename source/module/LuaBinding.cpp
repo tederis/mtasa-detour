@@ -8,6 +8,21 @@
 namespace WorldAssistant
 {
 
+int LuaBinding::navState(lua_State* luaVM)
+{
+    assert(luaVM);
+
+    bool state{};
+
+    auto& navigation = Navigation::GetInstance();
+    if (auto* navMesh = navigation.GetNavMesh()) {
+        state = navMesh->GetEffectiveTilesCount() > 0u; 
+    }
+
+    lua_pushboolean(luaVM, state);
+    return 1;
+}
+
 int LuaBinding::navLoad(lua_State* luaVM)
 {
     assert(luaVM);

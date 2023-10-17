@@ -58,6 +58,8 @@ public:
     void RemoveTile(const Int32Vector2& tile) override;
     // Remove all tiles from navigation mesh.
     void RemoveAllTiles() override;
+    // Return actual number of tiles.
+    std::size_t GetEffectiveTilesCount() const;
 
     void Dump(DebugMesh& mesh, bool triangulated = false, const BoundingBox* bounds = {});
 
