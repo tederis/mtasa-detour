@@ -69,14 +69,7 @@ bool Navigation::Initialize()
         return false;
     }
 
-    navmesh_ = std::make_shared<DynamicNavigationMesh>(world_.get());
-
-    navmesh_->Build();
-    Save("world.bin");
-
-    //Load("world.bin");
-
-    Dump("dump.obj");;
+    navmesh_ = std::make_shared<DynamicNavigationMesh>(world_.get());   
 
 	spdlog::info("Navigation module successfully loaded");
 
