@@ -16,6 +16,18 @@ NOTE: At the moment, Windows servers are only supported by this module. Linux su
 * Generate a project using the premake5 executable.
 * Build a project
 
+Installation
+======
+
+32 bit: Copy 32 bit navigation.dll into the server\mods\deathmatch\modules\ directory.
+
+64 bit: Copy 64 bit navigation.dll into the server\x64\modules\ directory.
+
+Then, add the following line in mtaserver.conf:
+```xml
+  <module src="navigation.dll" />
+```
+
 Functions
 ======
 ```lua
