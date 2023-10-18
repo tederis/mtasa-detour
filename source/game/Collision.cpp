@@ -170,7 +170,9 @@ bool Collision::Save(OutputStream& output)
         return false;
     }
 
-    std::size_t fileSize = 22 + 2 + 40 + 36;
+    const std::size_t headerSize = 22u + 2u + 40u + 36u + 4u;
+
+    std::size_t fileSize{ headerSize - 4u };
     fileSize += faces_.size() * sizeof(ColFace);
     fileSize += vertices_.size() * sizeof(ColVertex);
 
@@ -181,7 +183,7 @@ bool Collision::Save(OutputStream& output)
     bounds.radius_ = bounds_.radius_;
 
     output.WriteFileID("COL2");    
-    output.WriteUInt(fileSize);
+    output.WriteUInt(static_cast<std::uint32_t>(fileSize));
     output.WriteString(name_, 22);
     output.WriteUShort(0);
     output.Write(&bounds, sizeof(ColBoundingBox));
@@ -195,8 +197,12 @@ bool Collision::Save(OutputStream& output)
     output.WriteUInt(0); // Offset of spheres
     output.WriteUInt(0); // Offset of boxes
     output.WriteUInt(0); // Offset of lines
-    output.WriteUInt(22 + 2 + 40 + 36 + 4); // Offset of vertices
-    output.WriteUInt(22 + 2 + 40 + 36 + 4 + vertices_.size() * sizeof(ColVertex)); // Offset of faces
+
+    // Data offsets
+    const std::size_t verticesOffset = headerSize;
+    const std::size_t trisOffset = verticesOffset + vertices_.size() * sizeof(ColVertex);
+    output.WriteUInt(static_cast<uint32_t>(verticesOffset)); // Offset of vertices
+    output.WriteUInt(static_cast<uint32_t>(trisOffset)); // Offset of faces
     output.WriteUInt(0); // Offset of planes
 
     for (const auto& vertex : vertices_) {
@@ -216,7 +222,7 @@ bool Collision::Save(OutputStream& output)
     return true;
 }
 
-void Collision::Unpack(std::vector<Vector3F>& vertices, std::vector<int>& indices, const glm::mat4& transform, size_t startIndex, bool clear) const
+void Collision::Unpack(std::vector<Vector3F>& vertices, std::vector<std::int32_t>& indices, const glm::mat4& transform, std::int32_t startIndex, bool clear) const
 {
     if (clear) {
         if (vertices.capacity() < vertices_.size()) {
@@ -239,9 +245,9 @@ void Collision::Unpack(std::vector<Vector3F>& vertices, std::vector<int>& indice
     }
 
     for (const auto& face : faces_) {
-        indices.push_back(startIndex + static_cast<int>(face.a_));
-        indices.push_back(startIndex + static_cast<int>(face.b_));
-        indices.push_back(startIndex + static_cast<int>(face.c_));
+        indices.push_back(startIndex + static_cast<std::int32_t>(face.a_));
+        indices.push_back(startIndex + static_cast<std::int32_t>(face.b_));
+        indices.push_back(startIndex + static_cast<std::int32_t>(face.c_));
     }
 }
 

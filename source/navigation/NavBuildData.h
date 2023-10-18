@@ -38,7 +38,7 @@ struct NavBuildData
     // Vertices from geometries.
     std::vector<Vector3F> vertices_;
     // Triangle indices from geometries.
-    std::vector<int> indices_;
+    std::vector<std::int32_t> indices_;
     // Recast context.
     rcContext* ctx_;
     // Recast heightfield.

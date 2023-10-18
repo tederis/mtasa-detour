@@ -76,7 +76,7 @@ public:
 
 	bool Save(OutputStream& output);
 
-	void Unpack(std::vector<Vector3F>& vertices, std::vector<int>& indices, const glm::mat4& transform, size_t startIndex = {}, bool clear = false) const;
+	void Unpack(std::vector<Vector3F>& vertices, std::vector<std::int32_t>& indices, const glm::mat4& transform, std::int32_t startIndex = {}, bool clear = false) const;
 
 	std::size_t ApplyModifier(const CollisionModifier& modifier);
 
