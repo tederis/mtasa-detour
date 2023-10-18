@@ -1,9 +1,21 @@
 workspace "mta-navigation"
-    configurations { "Debug", "Release" }   
+    configurations { "Debug", "Release" }
+    platforms { "x86", "x64" }
 
-    language "C++"    
+    location "Build"
+    startproject "builder"
 
-    staticruntime "off"    
+    language "C++"
+    staticruntime "off"
+
+    defines {  
+        "_CRT_SECURE_NO_WARNINGS"
+    } 
+    
+    filter "platforms:x86"
+		architecture "x86"
+	filter "platforms:x64"
+		architecture "x86_64"
 
     filter "system:linux"
         cppdialect "C++2a"
@@ -11,23 +23,18 @@ workspace "mta-navigation"
     filter "system:windows"
         cppdialect "C++20"
         largeaddressaware "on"
+        defaultplatform "x86"
 
-    filter {}
+    filter "system:windows"
+        defines "WIN32"     
 
-    location "Build"
-    startproject "builder"
+    filter "configurations:Release"
+		optimize "Speed"
 
     filter {"system:windows", "configurations:Debug"}
         runtime "Debug"
-
     filter {"system:windows", "configurations:Release"}        
-        runtime "Release"
-
-    group "Vendor"
-        include "vendor/recastnavigation"
-        include "vendor/LZ4"
-        include "vendor/pugixml"
-        include "vendor/Lua"
+        runtime "Release"       
 
     group "Navigation"
         project "builder"
@@ -57,6 +64,7 @@ workspace "mta-navigation"
                 -- pugixml
                 "vendor/pugixml/src",
 
+                -- Vendor
                 "vendor"
             }
 
@@ -65,14 +73,6 @@ workspace "mta-navigation"
                 "pugixml",
                 "LZ4"
             }
-
-            filter "system:windows"
-                defines "WIN32"
-
-            filter {}
-                defines {  
-                    "_CRT_SECURE_NO_WARNINGS"
-                }
 
             filter "configurations:Debug"
                 defines { "DEBUG" }
@@ -110,8 +110,9 @@ workspace "mta-navigation"
                 "vendor/pugixml/src",
 
                 -- Lua
-                "vendor/lua/src",
+                "vendor/lua",
 
+                -- Vendor
                 "vendor"
             }
 
@@ -119,17 +120,14 @@ workspace "mta-navigation"
                 "LZ4",
                 "recastnavigation",
                 "pugixml",
-                "Lua"
-            }
+                "module-sdk"         
+            }         
 
-            filter "system:windows"
-                defines "WIN32"
-
-            filter {}
-                defines {  
-                    "_CRT_SECURE_NO_WARNINGS"
-                }
-
+            filter {"system:windows", "platforms:x86" }
+                links "vendor/lua/lib/lua5.1.lib"
+            filter {"system:windows", "platforms:x64" }
+                links "vendor/lua/lib/lua5.1_64.lib"
+       
             filter "configurations:Debug"
                 defines { "DEBUG" }
                 symbols "On"
@@ -137,4 +135,10 @@ workspace "mta-navigation"
             filter "configurations:Release"
                 defines { "NDEBUG" }
                 optimize "On"
+
+    group "Vendor"
+        include "vendor/recastnavigation"
+        include "vendor/LZ4"
+        include "vendor/pugixml"
+        include "vendor/module-sdk"
 
