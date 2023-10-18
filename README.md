@@ -28,6 +28,24 @@ Then, add the following line in mtaserver.conf:
   <module src="navigation.dll" />
 ```
 
+Make sure that game data files were previously copied into the server\mods\navmesh\ directory. This directory must contains three files: cols.col, defs.xml and nodes.xml.
+
+Description
+======
+
+This project aims at cover the wide spectrum of applications. Its kernel is the navigation mesh tools that allow to effectively find a path between world space points and query auxiliary data on a pregenerated data set.
+
+It consists of two parts: *game assets aggregator* and *server module*. Сonsider them in more detail.
+
+Game assets aggregator is responsible for loading game assets, their processing and creating a compact files contain all data necessary for the navigation mesh generating. It is placed in a separate tool called **builder**. Before a server is available to generate a navigation mesh this tool should be used to build a game data. For generating a game data run builder.exe with the following arguments:
+```
+builder -g GTASA_DIRECTORY -o SERVER_DIRECTORY
+```
+
+**NOTE:** You do not have to build the data yourself. The pregenerated data is available in the Releases section.
+
+Server module is responsible for the actual navigation mesh processing, including the navigation mesh building. Immediately after the launch of server navigation mesh is unloaded. To use it you have to build it (see *navBuild* function) or load from a file(see *navLoad* function). Once that is done all navigation mesh functions become available. 
+
 Functions
 ======
 ```lua
@@ -48,7 +66,7 @@ This function is used to save the navigation mesh to a file. Returns *true* if t
 ```lua
 bool navBuild()
 ```
-This function is used to build the navigation mesh. The function is not saving a navigation mesh into a file, you can use *navSave* for this. Returns *true* if the navmesh is successfully built, *false* otherwise.
+This function is used to build the navigation mesh. The function is not saving a navigation mesh into  a file, you can use *navSave* for this. Returns *true* if the navmesh is successfully built, *false* otherwise.
 
 ```lua
 bool navFindPath(float startX, float startY, float startZ, float endX, float endY, float endZ)
