@@ -40,6 +40,22 @@ int LuaBinding::navLoad(lua_State* luaVM)
     return 1;
 }
 
+int LuaBinding::navSave(lua_State* luaVM)
+{ 
+    if (lua_type(luaVM, 1) != LUA_TSTRING) {
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+
+    auto& navigation = Navigation::GetInstance();
+    
+    const char* path = lua_tostring(luaVM, 1);
+    const bool result = navigation.Save(path);
+
+    lua_pushboolean(luaVM, result);
+    return 1;
+}
+
 int LuaBinding::navFindPath(lua_State* luaVM)
 {
     if (lua_gettop(luaVM) != 6) {

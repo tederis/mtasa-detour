@@ -28,6 +28,7 @@ MTAEXPORT void RegisterFunctions(lua_State* luaVM)
     {
         pModuleManager->RegisterFunction(luaVM, "navState", LuaBinding::navState);
         pModuleManager->RegisterFunction(luaVM, "navLoad", LuaBinding::navLoad);
+        pModuleManager->RegisterFunction(luaVM, "navSave", LuaBinding::navSave);
         pModuleManager->RegisterFunction(luaVM, "navFindPath", LuaBinding::navFindPath);
         pModuleManager->RegisterFunction(luaVM, "navNearestPoint", LuaBinding::navNearestPoint);
         pModuleManager->RegisterFunction(luaVM, "navDump", LuaBinding::navDump);
