@@ -7,10 +7,10 @@
 #include "../navigation/NavigationMesh.h"
 #include "../utils/UtilsStream.h"
 
-class dtTileCache;
+#include "DetourTileCache.h"
+
 struct dtTileCacheAlloc;
 struct dtTileCacheCompressor;
-struct dtTileCacheMeshProcess;
 struct dtTileCacheLayer;
 struct dtTileCacheContourSet;
 struct dtTileCachePolyMesh;
@@ -28,7 +28,6 @@ struct TileCacheData
     unsigned char* data{};
     int dataSize{};
 };
-
 
 class DynamicNavigationMesh : public NavigationMesh, public std::enable_shared_from_this<DynamicNavigationMesh>
 {
@@ -61,11 +60,11 @@ public:
     // Return actual number of tiles.
     std::size_t GetEffectiveTilesCount() const;
 
-    void Dump(DebugMesh& mesh, bool triangulated = false, const BoundingBox* bounds = {});
+    bool Dump(DebugMesh& mesh, bool triangulated = false, const BoundingBox* bounds = {});
 
-    std::vector<unsigned char> Serialize() const;
+    bool Serialize(OutputStream& stream) const;
 
-    void Deserialize(const std::vector<unsigned char>& value);
+    bool Deserialize(InputStream& stream);
 
 protected:
     // Used by Obstacle class to add itself to the tile cache
@@ -87,7 +86,7 @@ protected:
 
 private:
      // Write tiles data.
-    void WriteTiles(OutputStream& dest, int x, int z) const;
+    bool WriteTiles(OutputStream& dest, int x, int z, dtCompressedTileRef* tiles) const;
     // Read tiles data to the navigation mesh.
     bool ReadTiles(InputStream& source, bool silent);
      // Free the tile cache.

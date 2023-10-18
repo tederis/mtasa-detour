@@ -91,14 +91,11 @@ bool Navigation::Save(const std::filesystem::path& path)
         return false;
     }
 
-    const auto cached = navmesh_->Serialize();
-	if (cached.size() > 0) {
-		std::ofstream stream(path, std::ios::out | std::ios::binary);
-		if (stream.is_open()) {
-			stream.write(reinterpret_cast<const char*>(cached.data()), cached.size());
-            return true;
-		}
-	}
+    std::ofstream stream(path, std::ios::out | std::ios::binary);
+    if (stream.is_open()) {
+        OutputFileStream output(stream);
+	    return navmesh_->Serialize(output);
+    }
 
     return false;
 }
@@ -109,30 +106,23 @@ bool Navigation::Load(const std::filesystem::path& path)
         return false;
     }
 
-    std::ifstream stream(path, std::ios::out | std::ios::binary | std::ios::ate);
+    std::ifstream stream(path, std::ios::in | std::ios::binary);
 	if (stream.is_open()) {
-		const auto size = stream.tellg();
-		stream.seekg(0);
-
-		std::vector<unsigned char> buffer;
-		buffer.resize(static_cast<std::size_t>(size));
-
-		stream.read(reinterpret_cast<char*>(buffer.data()), size);
-
-		if (buffer.size() > 0) {
-			navmesh_->Deserialize(buffer);
-            return true;
-		}
-	}
+        InputFileStream input(stream);
+        return navmesh_->Deserialize(input);
+    }	
 
     return false;
 }
 
 bool Navigation::Dump(const std::filesystem::path& path)
 {
-    if (navmesh_) {
-        DebugMesh mesh;
-        navmesh_->Dump(mesh);
+    if (!navmesh_) {
+        return false;
+    }
+
+    DebugMesh mesh;
+    if (navmesh_->Dump(mesh)) {
         mesh.Dump(path);
         return true;
     }

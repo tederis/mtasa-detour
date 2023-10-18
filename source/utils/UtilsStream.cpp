@@ -342,7 +342,13 @@ std::size_t OutputMemoryStream::Write(const void* data, std::size_t len)
     if (len + pos_ > size_)
     {
         size_ = len + pos_;
-        buffer_.resize(size_);
+
+		try	{
+			buffer_.resize(size_);
+		}
+		catch (const std::bad_alloc& e) {
+			return 0u;
+		}
     }
 
     auto* srcPtr = (unsigned char*)data;
