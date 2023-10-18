@@ -42,7 +42,7 @@ Game assets aggregator is responsible for loading game assets, their processing 
 builder -g GTASA_DIRECTORY -o SERVER_DIRECTORY
 ```
 
-**NOTE:** You do not have to build the data yourself. The pregenerated data is available in the Releases section.
+**NOTE:** You do not have to build the data yourself. The pregenerated data is available in the Releases section(see navmesh.zip).
 
 Server module is responsible for the actual navigation mesh processing, including the navigation mesh building. Immediately after the launch of server navigation mesh is unloaded. To use it you have to build it (see *navBuild* function) or load from a file(see *navLoad* function). Once that is done all navigation mesh functions become available. 
 
