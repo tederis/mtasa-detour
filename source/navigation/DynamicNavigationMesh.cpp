@@ -179,6 +179,12 @@ public:
         std::vector<std::pair<uint32_t, uint32_t>> blocks;
         std::mutex blocksMutex;
 
+	    // Create temp directory if not exists
+	    if (!std::filesystem::exists(tempDir)) {
+            spdlog::info("Temp directory was created.");
+		    std::filesystem::create_directories(tempDir);
+	    }
+
         spdlog::info("[MULTITHREADED] Start navigation mesh build! Running {} threads.", pool_.get_thread_count());
 
         pool_.parallelize_loop(0, numTilesX * numTilesZ,
@@ -514,7 +520,9 @@ std::vector<unsigned char> DynamicNavigationMesh::GetTileData(const Int32Vector2
 {
     std::vector<unsigned char> ret;
     OutputMemoryStream stream(ret);
-    WriteTiles(stream, tile.x_, tile.y_);
+
+    dtCompressedTileRef tiles[TILECACHE_MAXLAYERS];
+    WriteTiles(stream, tile.x_, tile.y_, tiles);
 
     return ret;
 }
@@ -565,10 +573,10 @@ std::size_t DynamicNavigationMesh::GetEffectiveTilesCount() const
     return 0u;
 }
 
-void DynamicNavigationMesh::Dump(DebugMesh& mesh, bool triangulated, const BoundingBox* bounds)
+bool DynamicNavigationMesh::Dump(DebugMesh& mesh, bool triangulated, const BoundingBox* bounds)
 {
     if (!navMesh_) {
-        return;
+        return false;
     }
 
     const dtNavMesh* navMesh = navMesh_;
@@ -614,7 +622,7 @@ void DynamicNavigationMesh::Dump(DebugMesh& mesh, bool triangulated, const Bound
         navMesh->calcTileLoc(&bounds->max_.x_, &maxTileX, &maxTileY);
 
         if (minTileX > maxTileX || minTileY > maxTileY) {
-            return;
+            return false;
         }
 
         const int32_t tilesH = maxTileX - minTileX;
@@ -642,13 +650,12 @@ void DynamicNavigationMesh::Dump(DebugMesh& mesh, bool triangulated, const Bound
             }
         }  
     }
+    
+    return true;
 }
 
-std::vector<unsigned char> DynamicNavigationMesh::Serialize() const
+bool DynamicNavigationMesh::Serialize(OutputStream& stream) const
 {
-    std::vector<unsigned char> ret;
-    OutputMemoryStream stream(ret);
-
     if (navMesh_ && tileCache_)
     {
         stream.WriteBoundingBox(boundingBox_);
@@ -661,23 +668,24 @@ std::vector<unsigned char> DynamicNavigationMesh::Serialize() const
         const dtTileCacheParams* tcParams = tileCache_->getParams();
         stream.Write(tcParams, sizeof(dtTileCacheParams));
 
-        for (int z = 0; z < numTilesZ_; ++z)
-            for (int x = 0; x < numTilesX_; ++x)
-                WriteTiles(stream, x, z);
+        dtCompressedTileRef tiles[TILECACHE_MAXLAYERS];
+
+        for (int z = 0; z < numTilesZ_; ++z) {
+            for (int x = 0; x < numTilesX_; ++x) {
+                if (!WriteTiles(stream, x, z, tiles)) {
+                    spdlog::error("An internal navmesh serialization error. Aborting the serialization process.");
+                    return false;
+                }
+            }
+        }
     }
 
-    return ret;
+    return true;
 }
 
-void DynamicNavigationMesh::Deserialize(const std::vector<unsigned char>& value)
+bool DynamicNavigationMesh::Deserialize(InputStream& stream)
 {
     ReleaseNavigationMesh();
-
-    if (value.empty()) {
-        return;
-    }
-
-    InputMemoryStream stream(value);
 
     boundingBox_ = stream.ReadBoundingBox();
     numTilesX_ = stream.ReadInt();
@@ -690,14 +698,14 @@ void DynamicNavigationMesh::Deserialize(const std::vector<unsigned char>& value)
     if (!navMesh_)
     {
         spdlog::error("Could not allocate navigation mesh");
-        return;
+        return false;
     }
 
     if (dtStatusFailed(navMesh_->init(&params)))
     {
         spdlog::error("Could not initialize navigation mesh");
         ReleaseNavigationMesh();
-        return;
+        return false;
     }
 
     dtTileCacheParams tcParams;     // NOLINT(hicpp-member-init)
@@ -708,16 +716,16 @@ void DynamicNavigationMesh::Deserialize(const std::vector<unsigned char>& value)
     {
         spdlog::error("Could not allocate tile cache");
         ReleaseNavigationMesh();
-        return;
+        return false;
     }
     if (dtStatusFailed(tileCache_->init(&tcParams, allocator_.get(), compressor_.get(), meshProcessor_.get())))
     {
         spdlog::error("Could not initialize tile cache");
         ReleaseNavigationMesh();
-        return;
+        return false;
     }
 
-    ReadTiles(stream, true); 
+    return ReadTiles(stream, true); 
 }
 
 void DynamicNavigationMesh::AddObstacle(Obstacle* obstacle)
@@ -999,20 +1007,24 @@ void DynamicNavigationMesh::ReleaseNavigationMesh()
     ReleaseTileCache();
 }
 
-void DynamicNavigationMesh::WriteTiles(OutputStream& dest, int x, int z) const
-{
-    dtCompressedTileRef tiles[TILECACHE_MAXLAYERS];
-    const int ct = tileCache_->getTilesAt(x, z, tiles, maxLayers_);
-    for (int i = 0; i < ct; ++i)
-    {
+bool DynamicNavigationMesh::WriteTiles(OutputStream& dest, int x, int z, dtCompressedTileRef* tiles) const
+{    
+    const int ct = tileCache_->getTilesAt(x, z, tiles, TILECACHE_MAXLAYERS);
+    for (int i = 0; i < ct; ++i) {
         const dtCompressedTile* tile = tileCache_->getTileByRef(tiles[i]);
-        if (!tile || !tile->header || !tile->dataSize)
+        if (!tile || !tile->header || !tile->dataSize) {
             continue; // Don't write "void-space" tiles
-                      // The header conveniently has the majority of the information required
+        }
+
         dest.Write(tile->header, sizeof(dtTileCacheLayerHeader));
         dest.WriteInt(tile->dataSize);
-        dest.Write(tile->data, (unsigned)tile->dataSize);
+
+        if (!dest.Write(tile->data, (unsigned)tile->dataSize)) {
+            return false;
+        }
     }
+    
+    return true;
 }
 
 bool DynamicNavigationMesh::ReadTiles(InputStream& source, bool silent)
