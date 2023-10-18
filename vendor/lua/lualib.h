@@ -8,7 +8,7 @@
 #ifndef lualib_h
 #define lualib_h
 
-#include "lua.h"
+#include <lua/lua.h>
 
 
 /* Key to file-handle type */
@@ -43,12 +43,8 @@ LUALIB_API int (luaopen_package) (lua_State *L);
 /* open all previous libraries */
 LUALIB_API void (luaL_openlibs) (lua_State *L); 
 
-/* Additional luautf8 library */
-LUALIB_API int luaopen_utf8(lua_State *L);
-
 #ifndef lua_assert
 #define lua_assert(x)	((void)0)
 #endif
-
 
 #endif
