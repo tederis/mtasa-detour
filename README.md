@@ -37,7 +37,7 @@ This project aims at cover the wide spectrum of applications. Its kernel is the 
 
 It consists of two parts: *game assets aggregator* and *server module*. Сonsider them in more detail.
 
-Game assets aggregator is responsible for loading game assets, their processing and creating a compact files contain all data necessary for the navigation mesh generating. It is placed in a separate tool called **builder**. Before a server is available to generate a navigation mesh this tool should be used to build a game data. For generating a game data run builder.exe with the following arguments:
+Game assets aggregator is responsible for loading game assets, their processing and creating compact files contain all data necessary for the navigation mesh generating. It is placed in a separate tool called **builder**. Before a server is available to generate a navigation mesh this tool should be used to build a game data. For generating a game data run builder.exe with the following arguments:
 ```
 builder -g GTASA_DIRECTORY -o SERVER_DIRECTORY
 ```
