@@ -21,14 +21,14 @@ Installation
 
 32 bit: Copy 32 bit navigation.dll into the server\mods\deathmatch\modules\ directory.
 
-64 bit: Copy 64 bit navigation.dll into the server\x64\modules\ directory.
+64 bit: Copy 64 bit navigation_64.dll into the server\x64\modules\ directory.
+
+Copy the contents of navmesh.zip into the server\navmesh\ directory. This directory must contains three files: cols.col, defs.xml and nodes.xml.
 
 Then, add the following line in mtaserver.conf:
 ```xml
   <module src="navigation.dll" />
 ```
-
-Make sure that game data files were previously copied into the server\navmesh\ directory. This directory must contains three files: cols.col, defs.xml and nodes.xml.
 
 **NOTE:** The module is memory intensive and your server must have at least 600 MB of free process memory. This limitation will be omitted later.
 
