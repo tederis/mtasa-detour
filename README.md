@@ -58,3 +58,7 @@ This function is used to dump navigation mesh tiles that are found in the region
 bool navScanWorld(float minX, float minY, float minZ, float maxX, float maxY, float maxZ)
 ```
 This function is used to find objects in the specified region. Returns a table of model IDs in the following format: { { model }, { model }, ... }.
+
+License
+======
+This repository is licensed under the GNU General Public License v3.0. Please review the license before using or contributing to this repository.
