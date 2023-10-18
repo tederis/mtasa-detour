@@ -249,7 +249,7 @@ void NavigationMesh::GetTileGeometry(NavBuildData* build, BoundingBox& box)
 			continue;
 		}
 
-		collision->Unpack(build->vertices_, build->indices_, node->GetTransform(), build->vertices_.size());
+		collision->Unpack(build->vertices_, build->indices_, node->GetTransform(), static_cast<std::int32_t>(build->vertices_.size()));
     }
 }
 

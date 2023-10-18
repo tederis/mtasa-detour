@@ -92,7 +92,8 @@ struct MeshProcess : public dtTileCacheMeshProcess
                     offMeshDir_.push_back((unsigned char)(connection->IsBidirectional() ? DT_OFFMESH_CON_BIDIR : 0));
                 }
             }
-            params->offMeshConCount = offMeshRadii_.size();
+
+            params->offMeshConCount = static_cast<std::int32_t>(offMeshRadii_.size());
             params->offMeshConVerts = &offMeshVertices_[0].x_;
             params->offMeshConRad = &offMeshRadii_[0];
             params->offMeshConFlags = &offMeshFlags_[0];
@@ -823,13 +824,13 @@ int DynamicNavigationMesh::BuildTile(int x, int z, TileCacheData* tiles)
         return 0;
     }
 
-    unsigned numTriangles = build.indices_.size() / 3;
+    const std::int32_t numTriangles = static_cast<std::int32_t>(build.indices_.size()) / 3;
     std::unique_ptr<unsigned char[]> triAreas(new unsigned char[numTriangles]);
     memset(triAreas.get(), 0, numTriangles);
 
-    rcMarkWalkableTriangles(build.ctx_, cfg.walkableSlopeAngle, &build.vertices_[0].x_, build.vertices_.size(),
+    rcMarkWalkableTriangles(build.ctx_, cfg.walkableSlopeAngle, &build.vertices_[0].x_, static_cast<std::int32_t>(build.vertices_.size()),
         &build.indices_[0], numTriangles, triAreas.get());
-    rcRasterizeTriangles(build.ctx_, &build.vertices_[0].x_, build.vertices_.size(), &build.indices_[0],
+    rcRasterizeTriangles(build.ctx_, &build.vertices_[0].x_, static_cast<std::int32_t>(build.vertices_.size()), &build.indices_[0],
         triAreas.get(), numTriangles, *build.heightField_, cfg.walkableClimb);
     rcFilterLowHangingWalkableObstacles(build.ctx_, cfg.walkableClimb, *build.heightField_);
 
@@ -1017,9 +1018,10 @@ void DynamicNavigationMesh::WriteTiles(OutputStream& dest, int x, int z) const
 bool DynamicNavigationMesh::ReadTiles(InputStream& source, bool silent)
 {
     tileQueue_.clear();
+
     while (!source.Eof())
     {
-        dtTileCacheLayerHeader header;      // NOLINT(hicpp-member-init)
+        dtTileCacheLayerHeader header;
         source.Read(&header, sizeof(dtTileCacheLayerHeader));
         const int dataSize = source.ReadInt();
 
@@ -1031,6 +1033,7 @@ bool DynamicNavigationMesh::ReadTiles(InputStream& source, bool silent)
         }
 
         source.Read(data, (unsigned)dataSize);
+
         if (dtStatusFailed(tileCache_->addTile(data, dataSize, DT_TILE_FREE_DATA, nullptr)))
         {
             spdlog::error("Failed to add tile");

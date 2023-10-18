@@ -279,10 +279,10 @@ bool Game::LoadIPL(const std::filesystem::path& filePath)
 		}
 	}
 
-	for (size_t i = 0; auto& placement : placements) {
+	for (std::size_t i = 0; auto& placement : placements) {
 		const auto* definition = GetDefinition(placement.model_);
 		if (definition) {
-			const bool isLOD = lods.contains(i) || definition->name_.starts_with("LOD");
+			const bool isLOD = lods.contains(static_cast<uint32_t>(i)) || definition->name_.starts_with("LOD");
 			if (isLOD) {
 				placement.flags_ |= LOD_FLAG;
 			}
@@ -345,7 +345,7 @@ bool Game::LoadIPLBinary(const std::vector<std::uint8_t>& buffer)
 	for (size_t i = 0; auto& placement : placements) {
 		const auto* definition = GetDefinition(placement.model_);
 		if (definition) {
-			const bool isLOD = lods.contains(i) || definition->name_.starts_with("LOD");
+			const bool isLOD = lods.contains(static_cast<uint32_t>(i)) || definition->name_.starts_with("LOD");
 			if (isLOD) {
 				placement.flags_ |= LOD_FLAG;
 			}

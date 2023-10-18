@@ -5,13 +5,14 @@
 #include "../utils/DebugMesh.h"
 #include "../navigation/DynamicNavigationMesh.h"
 
+#pragma warning( push )
+#pragma warning( disable : 4244 )
+
 namespace WorldAssistant
 {
 
 int LuaBinding::navState(lua_State* luaVM)
 {
-    assert(luaVM);
-
     bool state{};
 
     auto& navigation = Navigation::GetInstance();
@@ -25,8 +26,6 @@ int LuaBinding::navState(lua_State* luaVM)
 
 int LuaBinding::navLoad(lua_State* luaVM)
 {
-    assert(luaVM);
- 
     if (lua_type(luaVM, 1) != LUA_TSTRING) {
         lua_pushboolean(luaVM, false);
         return 1;
@@ -43,8 +42,6 @@ int LuaBinding::navLoad(lua_State* luaVM)
 
 int LuaBinding::navFindPath(lua_State* luaVM)
 {
-    assert(luaVM);
-
     if (lua_gettop(luaVM) != 6) {
         return luaL_error(luaVM, "expecting exactly 6 arguments");
     }
@@ -102,8 +99,6 @@ int LuaBinding::navFindPath(lua_State* luaVM)
 
 int LuaBinding::navNearestPoint(lua_State* luaVM)
 {
-    assert(luaVM);
-
     if (lua_gettop(luaVM) != 3) {
         return luaL_error(luaVM, "expecting exactly 3 arguments");
     }
@@ -139,15 +134,13 @@ int LuaBinding::navNearestPoint(lua_State* luaVM)
 
 int LuaBinding::navDump(lua_State* luaVM)
 {
-    assert(luaVM);
- 
     if (lua_type(luaVM, 1) != LUA_TSTRING) {
         lua_pushboolean(luaVM, false);
         return 1;
     }
 
     auto& navigation = Navigation::GetInstance();
-
+    
     const char* path = lua_tostring(luaVM, 1);
     const bool result = navigation.Dump(path);
 
@@ -157,8 +150,6 @@ int LuaBinding::navDump(lua_State* luaVM)
 
 int LuaBinding::navBuild(lua_State* luaVM)
 {
-    assert(luaVM);
-
     auto& navigation = Navigation::GetInstance(); 
     auto* navmesh = navigation.GetNavMesh();
     if (!navmesh) {
@@ -173,8 +164,6 @@ int LuaBinding::navBuild(lua_State* luaVM)
 
 int LuaBinding::navCollisionMesh(lua_State* luaVM)
 {
-    assert(luaVM);
-
     if (lua_gettop(luaVM) != 7) {
         return luaL_error(luaVM, "expecting exactly 7 arguments");
     }
@@ -201,7 +190,7 @@ int LuaBinding::navCollisionMesh(lua_State* luaVM)
 	scene->Query(&bounds.min_.x_, result);
 
     std::vector<Vector3F> vertices;
-    std::vector<int> indices;
+    std::vector<std::int32_t> indices;
 
     for (const auto& node : result) {
         auto* collision = world->GetModelCollision(node->GetModel());
@@ -209,7 +198,7 @@ int LuaBinding::navCollisionMesh(lua_State* luaVM)
 			continue;
 		}
 
-		collision->Unpack(vertices, indices, node->GetTransform(), vertices.size());
+		collision->Unpack(vertices, indices, node->GetTransform(), static_cast<std::int32_t>(vertices.size()));
     }
 
     DebugMesh mesh(std::move(vertices), std::move(indices));
@@ -241,8 +230,6 @@ int LuaBinding::navCollisionMesh(lua_State* luaVM)
 
 int LuaBinding::navNavigationMesh(lua_State* luaVM)
 {
-    assert(luaVM);
-
     if (lua_gettop(luaVM) != 7) {
         return luaL_error(luaVM, "expecting exactly 7 arguments");
     }
@@ -298,8 +285,6 @@ int LuaBinding::navNavigationMesh(lua_State* luaVM)
 
 int LuaBinding::navScanWorld(lua_State* luaVM)
 {
-    assert(luaVM);
-
     if (lua_gettop(luaVM) != 6) {
         return luaL_error(luaVM, "expecting exactly 6 arguments");
     }
@@ -343,3 +328,5 @@ int LuaBinding::navScanWorld(lua_State* luaVM)
 }
 
 }
+
+#pragma warning( pop )

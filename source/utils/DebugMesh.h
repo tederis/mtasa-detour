@@ -27,12 +27,12 @@ public:
 
 	void AddVertex(const Vector3F& pos);
 
-	std::vector<Vector3F> GetTriangleList() const;
+	std::vector<Vector3F> GetTriangleList() const;	
 
 private:
 	std::vector<Vector3F> vertices_;
 
-	std::vector<int32_t> indices_;
+	std::vector<std::int32_t> indices_;
 
 	std::vector<DebugLine> lines_;
 };
