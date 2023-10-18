@@ -1,5 +1,5 @@
 # mtasa-detour
-The server extension for MTA:SA that adds a navigation mesh
+The server extension for MTA:SA that adds a navigation mesh tools.
 ![mtasa-detour-preview](https://github.com/tederis/mtasa-detour/assets/12121551/1cf56319-6555-4253-aa5d-2ae5072c2a51)
 
 Status
@@ -28,7 +28,7 @@ Then, add the following line in mtaserver.conf:
   <module src="navigation.dll" />
 ```
 
-Make sure that game data files were previously copied into the server\mods\navmesh\ directory. This directory must contains three files: cols.col, defs.xml and nodes.xml.
+Make sure that game data files were previously copied into the server\navmesh\ directory. This directory must contains three files: cols.col, defs.xml and nodes.xml.
 
 Description
 ======
