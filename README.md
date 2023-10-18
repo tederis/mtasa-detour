@@ -30,6 +30,8 @@ Then, add the following line in mtaserver.conf:
 
 Make sure that game data files were previously copied into the server\navmesh\ directory. This directory must contains three files: cols.col, defs.xml and nodes.xml.
 
+**NOTE:** The module is memory intensive and your server must have at least 600 MB of free process memory. This limitation will be omitted later.
+
 Description
 ======
 
