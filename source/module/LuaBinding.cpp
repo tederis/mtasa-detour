@@ -1,9 +1,10 @@
-#include "module-sdk/extra/CLuaArguments.h"
-
 #include "../module/LuaBinding.h"
 #include "../module/Navigation.h"
 #include "../utils/DebugMesh.h"
 #include "../navigation/DynamicNavigationMesh.h"
+
+#ifdef EXPORT_LUA_API
+#include "module-sdk/extra/CLuaArguments.h"
 
 #pragma warning( push )
 #pragma warning( disable : 4244 )
@@ -346,3 +347,5 @@ int LuaBinding::navScanWorld(lua_State* luaVM)
 }
 
 #pragma warning( pop )
+
+#endif // EXPORT_LUA_API

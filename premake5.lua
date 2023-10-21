@@ -9,8 +9,20 @@ workspace "mta-navigation"
     staticruntime "off"
 
     defines {  
-        "_CRT_SECURE_NO_WARNINGS"
-    } 
+        "_CRT_SECURE_NO_WARNINGS",
+        "NAVIGATION_EXPORT"
+    }
+
+    newoption {
+        trigger = "navapi",
+        value = "API",
+        description = "Choose a particular API for export",
+        allowed = {
+           { "lua",    "MTA Lua" },
+           { "native",  "Native C" },
+        },
+        default = "lua"
+    }    
     
     filter "platforms:x86"
 		architecture "x86"
@@ -108,10 +120,7 @@ workspace "mta-navigation"
 
                 -- pugixml
                 "vendor/pugixml/src",
-
-                -- Lua
-                "vendor/lua",
-
+              
                 -- Vendor
                 "vendor"
             }
@@ -119,13 +128,20 @@ workspace "mta-navigation"
             links {
                 "LZ4",
                 "recastnavigation",
-                "pugixml",
-                "module-sdk"         
-            }         
+                "pugixml"        
+            }
 
-            filter {"system:windows", "platforms:x86" }
+            filter { "options:navapi=native" }
+                defines "EXPORT_NATIVE_API"
+
+            filter { "options:navapi=lua" }
+                links "module-sdk"
+                includedirs "vendor/lua"
+                defines "EXPORT_LUA_API"
+
+            filter {"system:windows", "platforms:x86", "options:navapi=lua" }
                 links "vendor/lua/lib/lua5.1.lib"
-            filter {"system:windows", "platforms:x64" }
+            filter {"system:windows", "platforms:x64", "options:navapi=lua" }
                 links "vendor/lua/lib/lua5.1_64.lib"
        
             filter "configurations:Debug"
@@ -140,5 +156,8 @@ workspace "mta-navigation"
         include "vendor/recastnavigation"
         include "vendor/LZ4"
         include "vendor/pugixml"
-        include "vendor/module-sdk"
+
+        if _OPTIONS["navapi"] == "lua" then
+            include "vendor/module-sdk"
+        end
 

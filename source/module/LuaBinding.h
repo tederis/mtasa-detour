@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef EXPORT_LUA_API
 #include <stdio.h>
 #include "module-sdk/ILuaModuleManager.h"
 
@@ -24,3 +25,5 @@ public:
 };
 
 }
+
+#endif // EXPORT_LUA_API

@@ -1,5 +1,5 @@
-#include "Navigation.h"
 #include "../utils/DebugMesh.h"
+#include "../module/Navigation.h"
 #include "../module/LuaBinding.h"
 #include "../scene/Scene.h"
 #include "../navigation/DynamicNavigationMesh.h"
@@ -8,8 +8,10 @@
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
- 
+
+#ifdef EXPORT_LUA_API 
 extern ILuaModuleManager10* pModuleManager;
+#endif // EXPORT_LUA_API
 
 namespace spdlog
 {
@@ -26,7 +28,10 @@ protected:
         std::memcpy(payload.data(), msg.payload.data(), msg.payload.size());
         payload[msg.payload.size()] = 0;
 
-        pModuleManager->Printf("%s\n", payload.data());
+#ifdef EXPORT_LUA_API 
+        if (pModuleManager)
+            pModuleManager->Printf("%s\n", payload.data());
+#endif
     }
 
     void flush_() override

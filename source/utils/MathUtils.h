@@ -274,6 +274,12 @@ public:
 		z_ /= len;
 	}
 
+    // Test for equality with another vector with epsilon.
+    bool Equals(const Vector3<T>& rhs) const
+    {
+        return WorldAssistant::Equals(x_, rhs.x_) && WorldAssistant::Equals(y_, rhs.y_) && WorldAssistant::Equals(z_, rhs.z_);
+    }
+
 	// Return normalized to unit length.
     Vector3<T> Normalized() const
     {

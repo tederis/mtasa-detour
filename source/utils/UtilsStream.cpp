@@ -346,7 +346,7 @@ std::size_t OutputMemoryStream::Write(const void* data, std::size_t len)
 		try	{
 			buffer_.resize(size_);
 		}
-		catch (const std::bad_alloc& e) {
+		catch ([[maybe_unused]] const std::bad_alloc& e) {
 			return 0u;
 		}
     }

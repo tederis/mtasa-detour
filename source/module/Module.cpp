@@ -3,6 +3,8 @@
 #include "../module/Module.h"
 #include "../module/Navigation.h"
 
+#ifdef EXPORT_LUA_API
+
 using namespace WorldAssistant;
 
 ILuaModuleManager10* pModuleManager = NULL;
@@ -59,3 +61,5 @@ MTAEXPORT bool ResourceStopped(lua_State* luaVM)
 {
     return true;
 }
+
+#endif // EXPORT_LUA_API
