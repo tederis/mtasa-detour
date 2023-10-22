@@ -45,12 +45,12 @@ struct NavigationCache
 };
 
 std::vector<Vector3F> SHARED_VECTORS;
-std::vector<int> SHARED_NUMBERS;
+std::vector<std::uint32_t> SHARED_NUMBERS;
 
 NavigationCache<Vector3F> NAVMESH_PATH_CACHE(SHARED_VECTORS);
 NavigationCache<Vector3F> COLLISION_VERTICES_CACHE(SHARED_VECTORS);
 NavigationCache<Vector3F> NAVMESH_VERTICES_CACHE(SHARED_VECTORS);
-NavigationCache<int> MODEL_INDICES_CACHE(SHARED_NUMBERS);
+NavigationCache<std::uint32_t> MODEL_INDICES_CACHE(SHARED_NUMBERS);
 
 }
 
@@ -89,7 +89,7 @@ bool NAVIGATION_API navSave(const char* filename)
     return navigation.Save(filename);
 }
 
-bool NAVIGATION_API navFindPath(float* startPos, float* endPos, int* outPointsNum, float* outPoints)
+bool NAVIGATION_API navFindPath(float* startPos, float* endPos, std::uint32_t* outPointsNum, float* outPoints)
 {
     if (outPointsNum == nullptr) {
         spdlog::error("Invalid points pointer");
@@ -120,28 +120,24 @@ bool NAVIGATION_API navFindPath(float* startPos, float* endPos, int* outPointsNu
         }
 
         NAVMESH_PATH_CACHE.args_ = args;
-    }
-
-    if (outPoints) {
-        if (*outPointsNum < 0) {
-            spdlog::error("Points number cannot be negative");
-            return false;
-        }
-
-        const size_t dataSize = std::min(static_cast<std::size_t>(*outPointsNum), NAVMESH_PATH_CACHE.array_.size()) * sizeof(Vector3F);
-        if (dataSize == 0) {
-            return false;
-        }
-
-        std::memcpy(outPoints, NAVMESH_PATH_CACHE.array_.data(), dataSize);
     }    
 
-    *outPointsNum = static_cast<int>(NAVMESH_PATH_CACHE.array_.size());
+    if (outPoints) {
+        *outPointsNum = std::min(*outPointsNum, static_cast<std::uint32_t>(NAVMESH_PATH_CACHE.array_.size()));
+        if (*outPointsNum == 0) {
+            return false;
+        }     
 
+        std::memcpy(outPoints, NAVMESH_PATH_CACHE.array_.data(), static_cast<std::size_t>(*outPointsNum) * sizeof(Vector3F));
+    }
+    else {
+        *outPointsNum = static_cast<std::uint32_t>(NAVMESH_PATH_CACHE.array_.size());
+    }
+    
     return true;
 }
 
-bool NAVIGATION_API navNearestPoint(float* startPos, float* outPoint)
+bool NAVIGATION_API navNearestPoint(float* pos, float* outPoint)
 {
     auto& navigation = Navigation::GetInstance();
     auto* navmesh = navigation.GetNavMesh();
@@ -149,7 +145,7 @@ bool NAVIGATION_API navNearestPoint(float* startPos, float* outPoint)
         return false;
     }
 
-    Vector3F point(startPos);
+    Vector3F point(pos);
 	Vector3F extents(2.0f, 2.0f, 2.0f);
 
     dtPolyRef nearestRef{};
@@ -181,7 +177,7 @@ bool NAVIGATION_API navBuild()
     return false;
 }
 
-bool NAVIGATION_API navCollisionMesh(float* boundsMin, float* boundsMax, float bias, int* outVerticesNum, float* outVertices)
+bool NAVIGATION_API navCollisionMesh(float* boundsMin, float* boundsMax, float bias, std::uint32_t* outVerticesNum, float* outVertices)
 {
     if (outVerticesNum == nullptr) {
         spdlog::error("Invalid vertices pointer");
@@ -232,25 +228,21 @@ bool NAVIGATION_API navCollisionMesh(float* boundsMin, float* boundsMax, float b
     }
 
     if (outVertices) {
-        if (*outVerticesNum < 0) {
-            spdlog::error("Vertices number cannot be negative");
+        *outVerticesNum = std::min(*outVerticesNum, static_cast<std::uint32_t>(COLLISION_VERTICES_CACHE.array_.size()));
+        if (*outVerticesNum == 0) {
             return false;
         }
 
-        const size_t dataSize = std::min(static_cast<std::size_t>(*outVerticesNum), COLLISION_VERTICES_CACHE.array_.size()) * sizeof(Vector3F);
-        if (dataSize == 0) {
-            return false;
-        }
-
-        std::memcpy(outVertices, COLLISION_VERTICES_CACHE.array_.data(), dataSize);
+        std::memcpy(outVertices, COLLISION_VERTICES_CACHE.array_.data(), static_cast<std::size_t>(*outVerticesNum) * sizeof(Vector3F));
     }    
-
-    *outVerticesNum = static_cast<int>(COLLISION_VERTICES_CACHE.array_.size());
+    else {
+        *outVerticesNum = static_cast<std::uint32_t>(COLLISION_VERTICES_CACHE.array_.size());
+    }
 
     return true;
 }
 
-bool NAVIGATION_API navNavigationMesh(float* boundsMin, float* boundsMax, float bias, int* outVerticesNum, float* outVertices)
+bool NAVIGATION_API navNavigationMesh(float* boundsMin, float* boundsMax, float bias, std::uint32_t* outVerticesNum, float* outVertices)
 {
     if (outVerticesNum == nullptr) {
         spdlog::error("Invalid vertices pointer");
@@ -289,25 +281,21 @@ bool NAVIGATION_API navNavigationMesh(float* boundsMin, float* boundsMax, float 
     }
 
     if (outVertices) {
-        if (*outVerticesNum < 0) {
-            spdlog::error("Vertices number cannot be negative");
+        *outVerticesNum = std::min(*outVerticesNum, static_cast<std::uint32_t>(NAVMESH_VERTICES_CACHE.array_.size()));
+        if (*outVerticesNum == 0) {
             return false;
         }
 
-        const size_t dataSize = std::min(static_cast<std::size_t>(*outVerticesNum), NAVMESH_VERTICES_CACHE.array_.size()) * sizeof(Vector3F);
-        if (dataSize == 0) {
-            return false;
-        }
-
-        std::memcpy(outVertices, NAVMESH_VERTICES_CACHE.array_.data(), dataSize);
+        std::memcpy(outVertices, NAVMESH_VERTICES_CACHE.array_.data(), static_cast<std::size_t>(*outVerticesNum) * sizeof(Vector3F));
     }    
-
-    *outVerticesNum = static_cast<int>(NAVMESH_VERTICES_CACHE.array_.size());
+    else {
+        *outVerticesNum = static_cast<std::uint32_t>(NAVMESH_VERTICES_CACHE.array_.size());
+    }
 
     return true;
 }
 
-bool NAVIGATION_API navScanWorld(float* boundsMin, float* boundsMax, int* outModelsNum, int* outModels)
+bool NAVIGATION_API navScanWorld(float* boundsMin, float* boundsMax, std::uint32_t* outModelsNum, std::uint32_t* outModels)
 {
     if (outModelsNum == nullptr) {
         spdlog::error("Invalid vertices pointer");
@@ -344,20 +332,16 @@ bool NAVIGATION_API navScanWorld(float* boundsMin, float* boundsMax, int* outMod
     }
 
     if (outModels) {
-        if (*outModelsNum < 0) {
-            spdlog::error("Vertices number cannot be negative");
+        *outModelsNum = std::min(*outModelsNum, static_cast<std::uint32_t>(MODEL_INDICES_CACHE.array_.size()));
+        if (*outModelsNum == 0) {
             return false;
         }
 
-        const size_t dataSize = std::min(static_cast<std::size_t>(*outModelsNum), MODEL_INDICES_CACHE.array_.size()) * sizeof(int);
-        if (dataSize == 0) {
-            return false;
-        }
-
-        std::memcpy(outModels, MODEL_INDICES_CACHE.array_.data(), dataSize);
+        std::memcpy(outModels, MODEL_INDICES_CACHE.array_.data(), static_cast<std::size_t>(*outModelsNum) * sizeof(std::size_t));
     }    
-
-    *outModelsNum = static_cast<int>(MODEL_INDICES_CACHE.array_.size());
+    else {
+        *outModelsNum = static_cast<std::uint32_t>(MODEL_INDICES_CACHE.array_.size());
+    }
 
     return true;
 }

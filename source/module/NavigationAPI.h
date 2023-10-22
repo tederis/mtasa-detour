@@ -34,19 +34,19 @@ extern "C"
 
 	bool NAVIGATION_API navSave(const char* filename);
 
-	bool NAVIGATION_API navFindPath(float* startPos, float* endPos, int* outPointsNum, float* outPoints);
+	bool NAVIGATION_API navFindPath(float* startPos, float* endPos, std::uint32_t* outPointsNum, float* outPoints);
 
-	bool NAVIGATION_API navNearestPoint(float* startPos, float* outPoint);
+	bool NAVIGATION_API navNearestPoint(float* point, float* outPoint);
 
 	bool NAVIGATION_API navDump(const char* filename);
 
 	bool NAVIGATION_API navBuild();
 
-	bool NAVIGATION_API navCollisionMesh(float* boundsMin, float* boundsMax, float bias, int* outVerticesNum, float* outVertices);
+	bool NAVIGATION_API navCollisionMesh(float* boundsMin, float* boundsMax, float bias, std::uint32_t* outVerticesNum, float* outVertices);
 
-	bool NAVIGATION_API navNavigationMesh(float* boundsMin, float* boundsMax, float bias, int* outVerticesNum, float* outVertices);
+	bool NAVIGATION_API navNavigationMesh(float* boundsMin, float* boundsMax, float bias, std::uint32_t* outVerticesNum, float* outVertices);
 
-	bool NAVIGATION_API navScanWorld(float* boundsMin, float* boundsMax, int* outModelsNum, int* outModels);
+	bool NAVIGATION_API navScanWorld(float* boundsMin, float* boundsMax, std::uint32_t* outModelsNum, std::uint32_t* outModels);
 }
 
 #endif // EXPORT_NATIVE_API
