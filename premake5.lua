@@ -7,6 +7,7 @@ workspace "mta-navigation"
 
     language "C++"
     staticruntime "off"
+    characterset "MBCS"
 
     defines {  
         "_CRT_SECURE_NO_WARNINGS",
@@ -32,6 +33,7 @@ workspace "mta-navigation"
     filter "system:linux"
         cppdialect "C++2a"
         links "pthread"
+        defaultplatform "x64"
     filter "system:windows"
         cppdialect "C++20"
         largeaddressaware "on"
@@ -135,14 +137,9 @@ workspace "mta-navigation"
                 defines "EXPORT_NATIVE_API"
 
             filter { "options:navapi=lua" }
-                links "module-sdk"
-                includedirs "vendor/lua"
-                defines "EXPORT_LUA_API"
-
-            filter {"system:windows", "platforms:x86", "options:navapi=lua" }
-                links "vendor/lua/lib/lua5.1.lib"
-            filter {"system:windows", "platforms:x64", "options:navapi=lua" }
-                links "vendor/lua/lib/lua5.1_64.lib"
+                links { "module-sdk", "Lua" }
+                includedirs "vendor/lua/src"
+                defines "EXPORT_LUA_API"       
        
             filter "configurations:Debug"
                 defines { "DEBUG" }
@@ -158,6 +155,7 @@ workspace "mta-navigation"
         include "vendor/pugixml"
 
         if _OPTIONS["navapi"] == "lua" then
+            include "vendor/lua"
             include "vendor/module-sdk"
         end
 

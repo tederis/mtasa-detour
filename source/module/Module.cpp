@@ -19,7 +19,9 @@ MTAEXPORT bool InitModule(ILuaModuleManager10* pManager, char* szModuleName, cha
     strncpy(szAuthor, MODULE_AUTHOR, MAX_INFO_LENGTH);
     (*fVersion) = MODULE_VERSION;
 
-    Navigation::GetInstance().Initialize();
+    VluaL_init();
+
+    Navigation::GetInstance().Initialize();    
 
     return true;
 }
@@ -49,6 +51,9 @@ MTAEXPORT bool DoPulse(void)
 MTAEXPORT bool ShutdownModule(void)
 {
     Navigation::GetInstance().Shutdown();
+
+    VluaL_close();
+
     return true;
 }
 
