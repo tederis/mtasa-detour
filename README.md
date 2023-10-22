@@ -10,8 +10,6 @@ Work in progress.
 Build instructions
 ======
 
-NOTE: At the moment, Windows servers are only supported by this module. Linux support will be added later.
-
 * Clone the repository.
 * Download premake5 executable and put it in the project's root folder.
 * Generate a project using the premake5 executable.
@@ -25,18 +23,31 @@ premake5 --navapi=native
 Installation
 ======
 
+**NOTE:** The module is memory intensive and server must have at least 600 MB of free process memory. This limitation will be omitted later.
+
+Copy(unzip) the contents of navmesh.zip into the server\navmesh\ directory. This directory must contain three files: cols.col, defs.xml and nodes.xml.
+
+Windows
+-
 32 bit: Copy 32 bit navigation.dll into the server\mods\deathmatch\modules\ directory.
 
 64 bit: Copy 64 bit navigation_64.dll into the server\x64\modules\ directory.
 
-Copy(unzip) the contents of navmesh.zip into the server\navmesh\ directory. This directory must contain three files: cols.col, defs.xml and nodes.xml.
-
-Then, add the following line in mtaserver.conf:
+Then, add the following line in *mtaserver.conf*:
 ```xml
   <module src="navigation.dll" />
 ```
 
-**NOTE:** The module is memory intensive and server must have at least 600 MB of free process memory. This limitation will be omitted later.
+Linux
+-
+32 bit: Copy 32 bit libnavigation.so into the server\mods\deathmatch\modules\ directory.
+
+64 bit: Copy 64 bit libnavigation_64.so into the server\x64\modules\ directory.
+
+Then, add the following line in *mtaserver.conf*:
+```xml
+  <module src="libnavigation.so" />
+```
 
 Description
 ======
