@@ -17,7 +17,7 @@ NOTE: At the moment, Windows servers are only supported by this module. Linux su
 * Generate a project using the premake5 executable.
 * Build a project
 
-There is two APIs that can be exported: Lua and native C. Lua is used by default. To generate a native C API you need to execute premake5 with the following arguments: 
+There are two APIs that can be exported: Lua and native C. Lua is used by default. To generate native API functions you need to execute premake5 with the following arguments: 
 ```
 premake5 --navapi=native
 ```
