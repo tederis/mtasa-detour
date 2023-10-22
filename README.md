@@ -11,10 +11,16 @@ Build instructions
 ======
 
 NOTE: At the moment, Windows servers are only supported by this module. Linux support will be added later.
+
 * Clone the repository.
 * Download premake5 executable and put it in the project's root folder.
 * Generate a project using the premake5 executable.
 * Build a project
+
+There is two APIs that can be exported: Lua and native C. Lua is used by default. To generate a native C API you need to execute premake5 with the following arguments: 
+```
+premake5 --navapi=native
+```
 
 Installation
 ======
@@ -54,7 +60,7 @@ Videos
 
 [https://youtu.be/40tvi-jHtNY?si=9wB57lJb-6nrqrma](https://youtu.be/40tvi-jHtNY?si=9wB57lJb-6nrqrma)
 
-Functions
+Lua functions
 ======
 ```lua
 bool navState()
@@ -74,7 +80,7 @@ This function is used to save the navigation mesh to a file. Returns *true* if t
 ```lua
 bool navBuild()
 ```
-This function is used to build the navigation mesh. The function is not saving a navigation mesh into  a file, you can use *navSave* for this. Returns *true* if the navmesh is successfully built, *false* otherwise. Note that this function is CPU extensive and the building process can freeze your server for a while. In the next version the building process will be asynchronous.
+This function is used to build the navigation mesh. The function is not saving a navigation mesh into a file, you can use *navSave* for this. Returns *true* if the navmesh is successfully built, *false* otherwise. Note that this function is CPU extensive and the building process can freeze your server for a while. In the next version the building process will be asynchronous.
 
 ```lua
 table navFindPath(float startX, float startY, float startZ, float endX, float endY, float endZ)
@@ -89,7 +95,7 @@ This function is used to find the nearest point on the navigation mesh to a give
 ```lua
 bool navDump(string filename)
 ```
-This function is used to dump the entire navigation mesh into a Wavefront *.obj* file. Can be used for the debug purposes. Returns true if the dump was successfully created, *false* otherwise.
+This function is used to dump the entire navigation mesh into a Wavefront *.obj* file. Can be used for the debug purposes. Returns *true* if the dump was successfully created, *false* otherwise.
 
 ```lua
 table navCollisionMesh(float minX, float minY, float minZ, float maxX, float maxY, float maxZ, float bias)
@@ -105,6 +111,68 @@ This function is used to dump navigation mesh vertices that are found in the reg
 table navScanWorld(float minX, float minY, float minZ, float maxX, float maxY, float maxZ)
 ```
 This function is used to find objects in the specified region. Returns a table of model IDs in the following format: { { model }, { model }, ... }.
+
+C functions
+======
+```C
+bool navInit()
+```
+This function is used initialize the navigation system. Returns *true* if the navmesh is initialized, *false* otherwise.
+
+```C
+bool navShutdown()
+```
+This function is used destroy the navigation system. Returns *true* if the navmesh is destroyed, *false* otherwise.
+
+```C
+bool navState()
+```
+This function is used to return the current state of the navigation mesh. Returns *true* if the navmesh is loaded, *false* otherwise.
+
+```C
+bool navLoad(const char* filename)
+```
+This function is used to load(reload) the navigation mesh from a previously generated file. Returns *true* if the navmesh is successfully loaded(reloaded), *false* otherwise.
+
+```C
+bool navSave(const char* filename)
+```
+This function is used to save the navigation mesh to a file. Returns *true* if the navmesh is successfully saved, *false* otherwise.
+
+```C
+bool navBuild()
+```
+This function is used to build the navigation mesh. The function is not saving a navigation mesh into a file, you can use *navSave* for this. Returns *true* if the navmesh is successfully built, *false* otherwise. Note that this function is CPU extensive and the building process can freeze your server for a while. In the next version the building process will be asynchronous.
+
+```C
+bool navFindPath(float* startPos, float* endPos, uint32_t* outPointsNum, float* outPoints)
+```
+This function is used to find a path between world space points. If *outPoints* is *NULL*, then the number of points is returned in *outPointsNum*. Otherwise, *outPointsNum* must point to a variable set by the user to the number of points in the *outPoints* array, and on return the variable is overwritten with the number of points actually written to *outPoints*. Returns *true* if the path was successfully found, *false* otherwise.
+
+```C
+bool navNearestPoint(float* pos, float* outPoint)
+```
+This function is used to find the nearest point on the navigation mesh to a given point. *outPoint* must point to a preallocated array of three float32 numbers. Returns *true* if the point was successfully found, *false* otherwise.
+
+```C
+bool navDump(const char* filename)
+```
+This function is used to dump the entire navigation mesh into a Wavefront *.obj* file. Can be used for the debug purposes. Returns *true* if the dump was successfully created, *false* otherwise.
+
+```C
+bool navCollisionMesh(float* boundsMin, float* boundsMax, float bias, uint32_t* outVerticesNum, float* outVertices)
+```
+This function is used to dump collision vertices that are found in the region. Can be used for the debug purposes. If *outVertices* is *NULL*, then the number of vertices is returned in *outVerticesNum*. Otherwise, *outVerticesNum* must point to a variable set by the user to the number of vertices in the *outVertices* array, and on return the variable is overwritten with the number of vertices actually written to *outVertices*. Returns *true* if the dump was successfully created, *false* otherwise.
+
+```C
+bool navNavigationMesh(float* boundsMin, float* boundsMax, float bias, uint32_t* outVerticesNum, float* outVertices)
+```
+This function is used to dump navigation mesh vertices that are found in the region. Can be used for the debug purposes. If *outVertices* is *NULL*, then the number of vertices is returned in *outVerticesNum*. Otherwise, *outVerticesNum* must point to a variable set by the user to the number of vertices in the *outVertices* array, and on return the variable is overwritten with the number of vertices actually written to *outVertices*. Returns *true* if the dump was successfully created, *false* otherwise.
+
+```C
+bool navScanWorld(float* boundsMin, float* boundsMax, uint32_t* outModelsNum, uint32_t* outModels)
+```
+This function is used to find object models in the specified region. If *outModels* is *NULL*, then the number of models is returned in *outModelsNum*. Otherwise, *outModelsNum* must point to a variable set by the user to the number of models in the *outModels* array, and on return the variable is overwritten with the number of models actually written to *outModels*. Returns *true* if the dump was successfully created, *false* otherwise.
 
 License
 ======
