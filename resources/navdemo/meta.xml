@@ -1,0 +1,13 @@
+<meta>
+	<info author="TEDERIs" version="1.0" name="NavigationDemo" description="Navigation module demo" type="script" />
+	<oop>true</oop>
+
+	<script src="utils.lua" type="shared" />
+	<script src="shared.lua" type="shared" />
+	
+	<script src="navigation_cl.lua" type="client" />
+	<script src="path_cl.lua" type="client" />
+	<script src="client.lua" type="client" />		
+
+	<script src="server.lua" type="server" />
+</meta>
